@@ -1,0 +1,97 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- Firebase App is always required and must be first -->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-app.js"></script>
+
+    <!-- Add additional services that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-functions.js"></script>
+
+    <!-- Comment out (or don't include) services that you don't want to use -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/5.1.0/firebase-storage.js"></script> -->
+
+    <script>
+        // var config = {
+        //     apiKey: "",
+        //     authDomain: "",
+        //     databaseURL: "",
+        //     projectId: "",
+        //     storageBucket: "",
+        //     messagingSenderId: ""
+        // };
+        firebase.initializeApp(config);
+    </script>
+</head>
+
+<body>
+    Ph Number<input type="text" id="number">
+    Code <input type="text" id="code">
+    <button onclick="register()">Sign in With Google</button>
+    <button id="sign-in-button" onclick="signInMobile()">Phone Signin</button>
+    <button onclick="sendCode()">send code</button>
+    <div id="recaptcha-container"></div>
+    <script>
+        firebase.auth().languageCode = 'en';
+        // window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
+        //     'size': 'invisible',
+        //     'callback': function (response) {
+        //         // reCAPTCHA solved, allow signInWithPhoneNumber.
+        //         onSignInSubmit();
+        //     }
+        // });
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
+            'size': 'invisible',
+            'callback': function (response) {
+                // reCAPTCHA solved, allow signInWithPhoneNumber.
+                onSignInSubmit();
+            }
+        });
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+        // // [END appVerifier]
+        // recaptchaVerifier.render().then(function (widgetId) {
+        //     window.recaptchaWidgetId = widgetId;
+        //     updateSignInButtonUI();
+        // });
+
+        var signInMobile = function () {
+
+            var appVerifier = window.recaptchaVerifier;
+            var phoneNum = document.getElementById("number").value;
+            firebase.auth().signInWithPhoneNumber(phoneNum, appVerifier)
+                .then(function (confirmationResult) {
+                    // SMS sent. Prompt user to type the code from the message, then sign the
+                    // user in with confirmationResult.confirm(code).
+                    console.log(confirmationResult);
+
+                    window.confirmationResult = confirmationResult;
+                }).catch(function (error) {
+                    // Error; SMS not sent
+                    // ...
+                    console.log(error);
+                });
+        }
+
+        var sendCode = function () {
+            var code = document.getElementById("code").value;
+            confirmationResult.confirm(code).then(function (result) {
+                // User signed in successfully.
+                console.log(result);
+                var user = result.user;
+                // ...
+            }).catch(function (error) {
+                // User couldn't sign in (bad verification code?)
+                // ...
+            });
+        }
+    </script>
+</body>
+
+</html>
